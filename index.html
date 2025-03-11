@@ -597,26 +597,44 @@
       </div>
     </div>
 
-    <!-- (새로 추가) 안양박달초 학사일정 & 급식 -->
-<div class="section" draggable="true">
-  <div class="section-header">
-    <span>안양박달초 학사일정 & 급식</span>
-    <button class="toggle-btn" aria-label="toggle">접기/펼치기</button>
-  </div>
-  <div class="section-content" style="padding: 20px;">
-    <h3>학사일정</h3>
-    <p style="margin-bottom:10px">현재 달의 학사일정을 불러옵니다.</p>
-    <button id="fetchScheduleBtn">학사일정 불러오기</button>
-    <div id="scheduleResult" class="result-area" style="margin-top: 10px;"></div>
+  <div id="sectionsContainer">
+    <!-- 안양박달초 학사일정 & 급식 -->
+    <div class="section" draggable="true">
+      <div class="section-header">
+        <span>안양박달초 학사일정 & 급식</span>
+        <button class="toggle-btn" aria-label="toggle">접기/펼치기</button>
+      </div>
+      <div class="section-content" style="padding: 20px;">
+        <h3>단위 선택</h3>
+        <div class="unit-selection">
+          <label for="scheduleUnit">학사일정 단위:</label>
+          <select id="scheduleUnit">
+            <option value="day">일간</option>
+            <option value="week">주간</option>
+            <option value="month" selected>월간</option>
+          </select>
+          
+          <label for="mealUnit">급식 정보 단위:</label>
+          <select id="mealUnit">
+            <option value="day">일간</option>
+            <option value="week">주간</option>
+            <option value="month" selected>월간</option>
+          </select>
+        </div>
 
-    <hr style="margin:20px 0;" />
+        <h3>학사일정</h3>
+        <button id="fetchScheduleBtn">학사일정 불러오기</button>
+        <div id="scheduleResult" class="result-area"></div>
 
-    <h3>급식정보</h3>
-    <p style="margin-bottom:10px">현재 달의 급식표를 불러옵니다.</p>
-    <button id="fetchMealsBtn">급식정보 불러오기</button>
-    <div id="mealsResult" class="result-area" style="margin-top: 10px;"></div>
-  </div>
-</div>
+        <hr style="margin:20px 0;" />
+
+        <h3>급식정보</h3>
+        <button id="fetchMealsBtn">급식정보 불러오기</button>
+        <div id="mealsResult" class="result-area"></div>
+      </div>
+    </div>
+
+  </div> <!-- sectionsContainer end -->
 
     <!-- 4. 학생 뽑기 -->
     <div class="section" draggable="true">
@@ -1009,34 +1027,40 @@
       });
     }
 
-   // NEIS 인증키 + 안양박달초 교육청/학교코드
-const NEIS_API_KEY = "cadc2f03764c4bba97ce5d8ddf6d10cb"; // 사용자님 키
-const ATPT_OFCDC_SC_CODE = "J10";    // 안양박달초 시도교육청코드
-const SD_SCHUL_CODE       = "7569022"; // 행정표준코드
+    // -----------------------------
+    // (1) 학사일정 불러오기 (단위에 맞춰서)
+    // -----------------------------
+    const fetchScheduleBtn = document.getElementById('fetchScheduleBtn');
+    const scheduleResult = document.getElementById('scheduleResult');
 
-// 학사일정 DOM 요소
-const fetchScheduleBtn = document.getElementById('fetchScheduleBtn');
-const scheduleResult = document.getElementById('scheduleResult');
+    fetchScheduleBtn.addEventListener('click', async () => {
+      const scheduleUnit = document.getElementById('scheduleUnit').value; // 사용자가 선택한 단위
+      let startDate, endDate;
 
-// 급식 DOM 요소
-const fetchMealsBtn = document.getElementById('fetchMealsBtn');
-const mealsResult = document.getElementById('mealsResult');
-
-// (1) 학사일정 불러오기
-if (fetchScheduleBtn && scheduleResult) {
-  fetchScheduleBtn.addEventListener('click', async () => {
-    try {
-      // 이번 달 날짜 범위
+      // 단위에 따라 날짜 범위 설정
       const today = new Date();
       const year = today.getFullYear();
-      const month = String(today.getMonth()+1).padStart(2,'0');
-      const startDate = `${year}${month}01`;
-      const endDate   = `${year}${month}31`;
+      const month = String(today.getMonth() + 1).padStart(2, '0');
+      const day = String(today.getDate()).padStart(2, '0');
+      
+      if (scheduleUnit === 'day') {
+        startDate = `${year}${month}${day}`;
+        endDate = startDate;
+      } else if (scheduleUnit === 'week') {
+        const weekStart = new Date(today.setDate(today.getDate() - today.getDay())); // 주 시작 날짜
+        const weekEnd = new Date(weekStart);
+        weekEnd.setDate(weekStart.getDate() + 6); // 주 종료 날짜
+        startDate = `${weekStart.getFullYear()}${String(weekStart.getMonth() + 1).padStart(2, '0')}${String(weekStart.getDate()).padStart(2, '0')}`;
+        endDate = `${weekEnd.getFullYear()}${String(weekEnd.getMonth() + 1).padStart(2, '0')}${String(weekEnd.getDate()).padStart(2, '0')}`;
+      } else {
+        startDate = `${year}${month}01`;
+        endDate = `${year}${month}31`; // 해당 월 전체 날짜
+      }
 
       const scheduleUrl = `https://open.neis.go.kr/hub/SchoolSchedule?Type=json`
-        + `&KEY=${NEIS_API_KEY}`
-        + `&ATPT_OFCDC_SC_CODE=${ATPT_OFCDC_SC_CODE}`
-        + `&SD_SCHUL_CODE=${SD_SCHUL_CODE}`
+        + `&KEY=cadc2f03764c4bba97ce5d8ddf6d10cb`
+        + `&ATPT_OFCDC_SC_CODE=J10`
+        + `&SD_SCHUL_CODE=7569022`
         + `&AA_FROM_YMD=${startDate}`
         + `&AA_TO_YMD=${endDate}`;
 
@@ -1049,37 +1073,49 @@ if (fetchScheduleBtn && scheduleResult) {
         return;
       }
 
-      // 예: data.SchoolSchedule[1].row
       const rows = data.SchoolSchedule[1].row;
       let html = '<ul>';
       rows.forEach(item => {
-        // item.AA_YMD: 일정 날짜, item.EVENT_NM: 일정명
-        html += `<li>${item.AA_YMD} : ${item.EVENT_NM}</li>`;
+        html += `<li><strong>${item.AA_YMD}</strong> : ${item.EVENT_NM}</li>`;
       });
       html += '</ul>';
       scheduleResult.innerHTML = html;
-    } catch (err) {
-      console.error(err);
-      scheduleResult.innerHTML = '학사일정 불러오기 오류! (API 키나 CORS 문제일 수도 있음)';
-    }
-  });
-}
+    });
 
-// (2) 급식정보 불러오기
-if (fetchMealsBtn && mealsResult) {
-  fetchMealsBtn.addEventListener('click', async () => {
-    try {
-      // 이번 달 날짜 범위
+    // -----------------------------
+    // (2) 급식정보 불러오기 (단위에 맞춰서)
+    // -----------------------------
+    const fetchMealsBtn = document.getElementById('fetchMealsBtn');
+    const mealsResult = document.getElementById('mealsResult');
+
+    fetchMealsBtn.addEventListener('click', async () => {
+      const mealUnit = document.getElementById('mealUnit').value; // 사용자가 선택한 단위
+      let startDate, endDate;
+
+      // 단위에 따라 날짜 범위 설정
       const today = new Date();
       const year = today.getFullYear();
-      const month = String(today.getMonth()+1).padStart(2,'0');
-      const startDate = `${year}${month}01`;
-      const endDate   = `${year}${month}31`;
+      const month = String(today.getMonth() + 1).padStart(2, '0');
+      const day = String(today.getDate()).padStart(2, '0');
+      
+      if (mealUnit === 'day') {
+        startDate = `${year}${month}${day}`;
+        endDate = startDate;
+      } else if (mealUnit === 'week') {
+        const weekStart = new Date(today.setDate(today.getDate() - today.getDay())); // 주 시작 날짜
+        const weekEnd = new Date(weekStart);
+        weekEnd.setDate(weekStart.getDate() + 6); // 주 종료 날짜
+        startDate = `${weekStart.getFullYear()}${String(weekStart.getMonth() + 1).padStart(2, '0')}${String(weekStart.getDate()).padStart(2, '0')}`;
+        endDate = `${weekEnd.getFullYear()}${String(weekEnd.getMonth() + 1).padStart(2, '0')}${String(weekEnd.getDate()).padStart(2, '0')}`;
+      } else {
+        startDate = `${year}${month}01`;
+        endDate = `${year}${month}31`; // 해당 월 전체 날짜
+      }
 
       const mealsUrl = `https://open.neis.go.kr/hub/mealServiceDietInfo?Type=json`
-        + `&KEY=${NEIS_API_KEY}`
-        + `&ATPT_OFCDC_SC_CODE=${ATPT_OFCDC_SC_CODE}`
-        + `&SD_SCHUL_CODE=${SD_SCHUL_CODE}`
+        + `&KEY=cadc2f03764c4bba97ce5d8ddf6d10cb`
+        + `&ATPT_OFCDC_SC_CODE=J10`
+        + `&SD_SCHUL_CODE=7569022`
         + `&MLSV_FROM_YMD=${startDate}`
         + `&MLSV_TO_YMD=${endDate}`;
 
@@ -1095,20 +1131,15 @@ if (fetchMealsBtn && mealsResult) {
       const rows = data.mealServiceDietInfo[1].row;
       let html = '<ul>';
       rows.forEach(meal => {
-        // meal.MLSV_YMD: 날짜, meal.DDISH_NM: 메뉴
-        // DDISH_NM 내 <br/> 등 줄바꿈 치환
         const dateStr = meal.MLSV_YMD;
         const menus = meal.DDISH_NM.replace(/<br\/>/g, ', ');
         html += `<li><strong>${dateStr}</strong> : ${menus}</li>`;
       });
       html += '</ul>';
       mealsResult.innerHTML = html;
-    } catch (err) {
-      console.error(err);
-      mealsResult.innerHTML = '급식정보 불러오기 오류! (API 키나 CORS 문제일 수도 있음)';
-    }
-  });
-}
+    });
+  </script>
+   
 
     // -----------------------------
     // 4. 학생 뽑기
