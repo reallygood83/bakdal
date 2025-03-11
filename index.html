@@ -1083,206 +1083,164 @@
     });
 
     // -----------------------------
-    // (2) 급식정보 불러오기 (단위에 맞춰서)
-    // -----------------------------
-    const fetchMealsBtn = document.getElementById('fetchMealsBtn');
-    const mealsResult = document.getElementById('mealsResult');
+// (2) 급식 정보 불러오기 (단위에 따라)
+// -----------------------------
+const fetchMealsBtn = document.getElementById('fetchMealsBtn');
+const mealsResult = document.getElementById('mealsResult');
 
-    fetchMealsBtn.addEventListener('click', async () => {
-      const mealUnit = document.getElementById('mealUnit').value; // 사용자가 선택한 단위
-      let startDate, endDate;
+// 날짜를 'YYYYMMDD' 형식으로 포맷하는 함수
+const formatDate = (date) =>
+  `${date.getFullYear()}${String(date.getMonth() + 1).padStart(2, '0')}${String(date.getDate()).padStart(2, '0')}`;
 
-      // 단위에 따라 날짜 범위 설정
-      const today = new Date();
-      const year = today.getFullYear();
-      const month = String(today.getMonth() + 1).padStart(2, '0');
-      const day = String(today.getDate()).padStart(2, '0');
-      
-      if (mealUnit === 'day') {
-        startDate = `${year}${month}${day}`;
-        endDate = startDate;
-      } else if (mealUnit === 'week') {
-        const weekStart = new Date(today.setDate(today.getDate() - today.getDay())); // 주 시작 날짜
+fetchMealsBtn.addEventListener('click', async () => {
+  const mealUnit = document.getElementById('mealUnit').value; // 사용자가 선택한 단위
+  const today = new Date();
+
+  let startDate, endDate;
+
+  try {
+    // 선택한 단위에 따라 날짜 범위 설정
+    switch (mealUnit) {
+      case 'day':
+        startDate = endDate = formatDate(today);
+        break;
+      case 'week':
+        const weekStart = new Date(today.setDate(today.getDate() - today.getDay()));
         const weekEnd = new Date(weekStart);
-        weekEnd.setDate(weekStart.getDate() + 6); // 주 종료 날짜
-        startDate = `${weekStart.getFullYear()}${String(weekStart.getMonth() + 1).padStart(2, '0')}${String(weekStart.getDate()).padStart(2, '0')}`;
-        endDate = `${weekEnd.getFullYear()}${String(weekEnd.getMonth() + 1).padStart(2, '0')}${String(weekEnd.getDate()).padStart(2, '0')}`;
-      } else {
-        startDate = `${year}${month}01`;
-        endDate = `${year}${month}31`; // 해당 월 전체 날짜
-      }
-
-      const mealsUrl = `https://open.neis.go.kr/hub/mealServiceDietInfo?Type=json`
-        + `&KEY=cadc2f03764c4bba97ce5d8ddf6d10cb`
-        + `&ATPT_OFCDC_SC_CODE=J10`
-        + `&SD_SCHUL_CODE=7569022`
-        + `&MLSV_FROM_YMD=${startDate}`
-        + `&MLSV_TO_YMD=${endDate}`;
-
-      const res = await fetch(mealsUrl);
-      if (!res.ok) throw new Error('급식 API 오류');
-
-      const data = await res.json();
-      if (!data.mealServiceDietInfo) {
-        mealsResult.innerHTML = '급식 정보가 없습니다.';
-        return;
-      }
-
-      const rows = data.mealServiceDietInfo[1].row;
-      let html = '<ul>';
-      rows.forEach(meal => {
-        const dateStr = meal.MLSV_YMD;
-        const menus = meal.DDISH_NM.replace(/<br\/>/g, ', ');
-        html += `<li><strong>${dateStr}</strong> : ${menus}</li>`;
-      });
-      html += '</ul>';
-      mealsResult.innerHTML = html;
-    });
-  </script>
-   
-
-    // -----------------------------
-    // 4. 학생 뽑기
-    // -----------------------------
-    const totalStudentsInput = document.getElementById('totalStudents');
-    const pickCountInput = document.getElementById('pickCount');
-    const pickStudentsBtn = document.getElementById('pickStudentsBtn');
-    const resetPickerBtn = document.getElementById('resetPickerBtn');
-    const pickerResult = document.getElementById('pickerResult');
-
-    let pickedStudents = [];
-
-    pickStudentsBtn.addEventListener('click', () => {
-      const totalStudents = parseInt(totalStudentsInput.value);
-      let pickCount = parseInt(pickCountInput.value);
-
-      if (isNaN(totalStudents) || totalStudents < 1) {
-        alert('유효한 학생 수를 입력하세요.');
-        return;
-      }
-      if (isNaN(pickCount) || pickCount < 1) {
-        alert('유효한 뽑을 학생 수를 입력하세요.');
-        return;
-      }
-      if (pickCount > totalStudents) {
-        pickCount = totalStudents;
-        pickCountInput.value = totalStudents;
-      }
-
-      // 이미 뽑힌 학생 제외하고 뽑기
-      const availableStudents = Array.from({ length: totalStudents }, (_, i) => i + 1).filter(
-        (num) => !pickedStudents.includes(num)
-      );
-
-      if (availableStudents.length === 0) {
-        alert('모든 학생이 이미 선택되었습니다. 초기화 버튼을 눌러주세요.');
-        return;
-      }
-      if (pickCount > availableStudents.length) {
-        pickCount = availableStudents.length;
-      }
-
-      // 랜덤 셔플
-      for (let i = availableStudents.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [availableStudents[i], availableStudents[j]] = [availableStudents[j], availableStudents[i]];
-      }
-
-      const selectedStudents = availableStudents.slice(0, pickCount);
-      pickedStudents = [...pickedStudents, ...selectedStudents];
-
-      pickerResult.innerHTML = `\n        <p><strong>선택된 학생 번호:</strong> ${selectedStudents.sort((a, b) => a - b).join(', ')}<\/p>\n        <p><strong>지금까지 뽑힌 학생:</strong> ${pickedStudents.sort((a, b) => a - b).join(', ')}<\/p>\n        <p><strong>남은 학생 수:</strong> ${totalStudents - pickedStudents.length}명<\/p>\n      `;
-    });
-
-    resetPickerBtn.addEventListener('click', () => {
-      pickedStudents = [];
-      pickerResult.innerHTML = '<p>학생을 뽑으면 결과가 여기에 표시됩니다.</p>';
-    });
-
-    // -----------------------------
-    // 5. 모둠 편성
-    // -----------------------------
-    const makeTeamsBtn = document.getElementById('makeTeamsBtn');
-    const resetTeamsBtn = document.getElementById('resetTeamsBtn');
-    const teamTotalStudents = document.getElementById('teamTotalStudents');
-    const missingNumbersInput = document.getElementById('missingNumbers');
-    const groupCountInput = document.getElementById('groupCount');
-    const teamsResult = document.getElementById('teamsResult');
-
-    function shuffleArray(array) {
-      for (let i = array.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [array[i], array[j]] = [array[j], array[i]];
-      }
-      return array;
+        weekEnd.setDate(weekStart.getDate() + 6);
+        startDate = formatDate(weekStart);
+        endDate = formatDate(weekEnd);
+        break;
+      default:
+        startDate = `${today.getFullYear()}${String(today.getMonth() + 1).padStart(2, '0')}01`;
+        endDate = `${today.getFullYear()}${String(today.getMonth() + 1).padStart(2, '0')}31`;
     }
 
-    makeTeamsBtn.addEventListener('click', () => {
-      const total = parseInt(teamTotalStudents.value);
-      if (isNaN(total) || total < 1) {
-        alert('유효한 학생 총 수를 입력하세요.');
-        return;
-      }
+    const mealsUrl = `https://open.neis.go.kr/hub/mealServiceDietInfo?Type=json&KEY=cadc2f03764c4bba97ce5d8ddf6d10cb&ATPT_OFCDC_SC_CODE=J10&SD_SCHUL_CODE=7569022&MLSV_FROM_YMD=${startDate}&MLSV_TO_YMD=${endDate}`;
+    
+    const res = await fetch(mealsUrl);
+    if (!res.ok) throw new Error('급식 API 오류');
 
-      const groupCount = parseInt(groupCountInput.value);
-      if (isNaN(groupCount) || groupCount < 1) {
-        alert('유효한 모둠 수를 입력하세요.');
-        return;
-      }
+    const data = await res.json();
+    if (!data.mealServiceDietInfo) {
+      mealsResult.innerHTML = '급식 정보가 없습니다.';
+      return;
+    }
 
-      const missingStr = missingNumbersInput.value.trim();
-      let missingNums = [];
-      if (missingStr) {
-        const parts = missingStr.split(',');
-        parts.forEach((p) => {
-          const val = parseInt(p);
-          if (!isNaN(val)) {
-            missingNums.push(val);
-          }
-        });
-      }
+    // 급식 정보 출력
+    const rows = data.mealServiceDietInfo[1].row;
+    const html = rows.map(meal => {
+      const dateStr = meal.MLSV_YMD;
+      const menus = meal.DDISH_NM.replace(/<br\/>/g, ', ');
+      return `<li><strong>${dateStr}</strong> : ${menus}</li>`;
+    }).join('');
+    mealsResult.innerHTML = `<ul>${html}</ul>`;
+  } catch (error) {
+    mealsResult.innerHTML = `급식 정보를 가져오는 중 오류 발생: ${error.message}`;
+  }
+});
 
-      missingNums = missingNums.filter((n) => n >= 1 && n <= total);
+// -----------------------------
+// 4. 랜덤 학생 뽑기
+// -----------------------------
+const totalStudentsInput = document.getElementById('totalStudents');
+const pickCountInput = document.getElementById('pickCount');
+const pickStudentsBtn = document.getElementById('pickStudentsBtn');
+const resetPickerBtn = document.getElementById('resetPickerBtn');
+const pickerResult = document.getElementById('pickerResult');
 
-      let available = [];
-      for (let i = 1; i <= total; i++) {
-        if (!missingNums.includes(i)) {
-          available.push(i);
-        }
-      }
+let pickedStudents = []; // 이미 뽑힌 학생 저장
 
-      if (available.length === 0) {
-        alert('사용할 수 있는 학생 번호가 없습니다! (모두 없는 번호로 지정됨)');
-        return;
-      }
+pickStudentsBtn.addEventListener('click', () => {
+  const totalStudents = parseInt(totalStudentsInput.value);
+  let pickCount = parseInt(pickCountInput.value);
 
-      shuffleArray(available);
+  // 입력값 검증
+  if (!totalStudents || totalStudents < 1 || !pickCount || pickCount < 1) {
+    alert('유효한 학생 수와 뽑을 수를 입력하세요.');
+    return;
+  }
 
-      const teams = [];
-      for (let i = 0; i < groupCount; i++) {
-        teams.push([]);
-      }
-      let idx = 0;
-      available.forEach((student) => {
-        teams[idx].push(student);
-        idx = (idx + 1) % groupCount;
-      });
+  // 이미 뽑힌 학생 제외하고 남은 학생 목록 생성
+  const availableStudents = Array.from({ length: totalStudents }, (_, i) => i + 1)
+    .filter(num => !pickedStudents.includes(num));
 
-      let html = '';
-      teams.forEach((team, i) => {
-        team.sort((a, b) => a - b);
-        html += `<p><strong>${i + 1}모둠 (${team.length}명):</strong> ${team.join(', ')}</p>`;
-      });
+  if (availableStudents.length === 0) {
+    alert('모든 학생이 이미 선택되었습니다. 초기화 버튼을 눌러주세요.');
+    return;
+  }
 
-      teamsResult.innerHTML = html;
-    });
+  pickCount = Math.min(pickCount, availableStudents.length);
 
-    resetTeamsBtn.addEventListener('click', () => {
-      teamTotalStudents.value = 30;
-      missingNumbersInput.value = '';
-      groupCountInput.value = 4;
-      teamsResult.innerHTML = '<p>모둠 편성 결과가 여기에 표시됩니다.</p>';
-    });
+  // 랜덤하게 학생 선택
+  const selectedStudents = availableStudents.sort(() => Math.random() - 0.5).slice(0, pickCount);
+  pickedStudents.push(...selectedStudents);
+
+  // 결과 출력
+  pickerResult.innerHTML = `
+    <p><strong>선택된 학생:</strong> ${selectedStudents.sort((a, b) => a - b).join(', ')}</p>
+    <p><strong>지금까지 선택된 학생:</strong> ${pickedStudents.sort((a, b) => a - b).join(', ')}</p>
+    <p><strong>남은 학생 수:</strong> ${totalStudents - pickedStudents.length}</p>`;
+});
+
+resetPickerBtn.addEventListener('click', () => {
+  pickedStudents = [];
+  pickerResult.innerHTML = '<p>학생을 뽑으면 결과가 여기에 표시됩니다.</p>';
+});
+
+// -----------------------------
+// 5. 모둠 편성
+// -----------------------------
+const makeTeamsBtn = document.getElementById('makeTeamsBtn');
+const resetTeamsBtn = document.getElementById('resetTeamsBtn');
+const teamTotalStudents = document.getElementById('teamTotalStudents');
+const missingNumbersInput = document.getElementById('missingNumbers');
+const groupCountInput = document.getElementById('groupCount');
+const teamsResult = document.getElementById('teamsResult');
+
+makeTeamsBtn.addEventListener('click', () => {
+  const total = parseInt(teamTotalStudents.value);
+  const groupCount = parseInt(groupCountInput.value);
+  const missingNums = missingNumbersInput.value
+    .split(',')
+    .map(num => parseInt(num.trim()))
+    .filter(num => num && num > 0 && num <= total);
+
+  if (!total || !groupCount || total < 1 || groupCount < 1) {
+    alert('총 학생 수와 모둠 수를 올바르게 입력하세요.');
+    return;
+  }
+
+  // 제외할 학생을 빼고 가능한 학생 목록 생성
+  const available = Array.from({ length: total }, (_, i) => i + 1).filter(num => !missingNums.includes(num));
+
+  if (available.length === 0) {
+    alert('사용 가능한 학생이 없습니다!');
+    return;
+  }
+
+  // 랜덤 셔플
+  available.sort(() => Math.random() - 0.5);
+
+  const teams = Array.from({ length: groupCount }, () => []);
+  available.forEach((student, idx) => {
+    teams[idx % groupCount].push(student);
+  });
+
+  // 결과 출력
+  const html = teams.map((team, idx) => 
+    `<p><strong>${idx + 1}모둠 (${team.length}명):</strong> ${team.sort((a, b) => a - b).join(', ')}</p>`
+  ).join('');
+  teamsResult.innerHTML = html;
+});
+
+resetTeamsBtn.addEventListener('click', () => {
+  teamTotalStudents.value = 30;
+  missingNumbersInput.value = '';
+  groupCountInput.value = 4;
+  teamsResult.innerHTML = '<p>모둠 편성 결과가 여기에 표시됩니다.</p>';
+});
+
 
     // -----------------------------
     // (C) TEST CASES
@@ -1311,4 +1269,4 @@
   </p>
 </footer>
 
-$1
+
