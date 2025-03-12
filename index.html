@@ -995,36 +995,41 @@
     // -----------------------------
     // 3. GPT 텍스트 생성 버튼 클릭 시
     // -----------------------------
-   document.getElementById('generateTextBtn').addEventListener('click', async function() {
-    const inputText = document.getElementById('gptInput').value;
+    document.getElementById('generateTextBtn').addEventListener('click', async function() {
+  const inputText = document.getElementById('gptInput').value;
 
-    if (!inputText.trim()) {
-      alert('주제를 입력해 주세요!');
-      return;
+  if (!inputText.trim()) {
+    alert('주제를 입력해 주세요!');
+    return;
+  }
+
+  const gptOutput = document.getElementById('gptOutput');
+  gptOutput.innerHTML = 'Gemini가 글을 생성 중입니다...';
+
+  try {
+    const response = await fetch('/api/gpt', {
+      method: 'POST', // 반드시 POST로 설정!
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        prompt: inputText
+      })
+    });
+
+    const data = await response.json();
+
+    if (data.answer) {
+      gptOutput.innerHTML = `<strong>생성된 글:</strong><p>${data.answer}</p>`;
+    } else {
+      gptOutput.innerHTML = '글 생성에 실패했습니다. 다시 시도해 주세요.';
     }
+  } catch (error) {
+    console.error('서버리스 함수 호출 오류:', error);
+    gptOutput.innerHTML = '글 생성에 오류가 발생했습니다. 다시 시도해 주세요.';
+  }
+});
 
-    const gptOutput = document.getElementById('gptOutput');
-    gptOutput.innerHTML = 'Gemini가 글을 생성 중입니다...';
-
-    try {
-      const response = await fetch('/api/gpt', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ prompt: inputText })
-      });
-
-      const data = await response.json();
-
-      if (data.answer) {
-        gptOutput.innerHTML = `<strong>생성된 글:</strong><p>${data.answer}</p>`;
-      } else {
-        gptOutput.innerHTML = '글 생성에 실패했습니다. 다시 시도해 주세요.';
-      }
-    } catch (error) {
-      console.error('서버리스 함수 호출 오류:', error);
-      gptOutput.innerHTML = '글 생성에 오류가 발생했습니다. 다시 시도해 주세요.';
-    }
-  });
     
     // -----------------------------
     // 3. 디지털 시계 & 타이머 기능 + 사운드
