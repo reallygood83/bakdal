@@ -18,7 +18,7 @@ export default async function handler(req, res) {
         'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`
       },
       body: JSON.stringify({
-        model: model || "gpt-4o-mini",  // 기본값 설정, 필요에 따라 수정
+        model: model || "gpt-3.5-turbo",  // 기본값 설정, 필요에 따라 수정
         prompt: prompt,
         max_tokens: max_tokens || 200,
         temperature: temperature || 0.7,
