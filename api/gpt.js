@@ -1,4 +1,3 @@
-// api/gpt.js (Gemini API용으로 수정됨)
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
     res.status(405).json({ error: 'Method Not Allowed' });
@@ -6,10 +5,21 @@ export default async function handler(req, res) {
   }
 
   const { prompt } = req.body;
+  const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
+
+  // 환경변수, 입력값이 제대로 들어오는지 확인
+  console.log('GEMINI API KEY:', GEMINI_API_KEY);
+  console.log('Prompt:', prompt);
+
+  if (!GEMINI_API_KEY) {
+    return res.status(500).json({ error: 'GEMINI_API_KEY is not set' });
+  }
+
+  if (!prompt) {
+    return res.status(400).json({ error: 'Prompt is missing' });
+  }
 
   try {
-    const GEMINI_API_KEY = process.env.GEMINI_API_KEY; // 환경변수에서 Gemini API 키를 가져옵니다.
-
     const response = await fetch(`https://generativelanguage.googleapis.com/v1/models/gemini-pro:generateContent?key=${GEMINI_API_KEY}`, {
       method: 'POST',
       headers: {
@@ -17,14 +27,14 @@ export default async function handler(req, res) {
       },
       body: JSON.stringify({
         contents: [
-          {
-            parts: [{ text: prompt }]
-          }
+          { parts: [{ text: prompt }] }
         ]
       })
     });
 
     const data = await response.json();
+
+    console.log('Gemini API Response:', data); // 응답 확인
 
     if (data.candidates && data.candidates[0].content.parts[0].text) {
       res.status(200).json({ answer: data.candidates[0].content.parts[0].text });
