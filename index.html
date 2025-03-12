@@ -995,7 +995,7 @@
     // -----------------------------
     // 3. GPT 텍스트 생성 버튼 클릭 시
     // -----------------------------
-    document.getElementById('generateTextBtn').addEventListener('click', async function() {
+   document.getElementById('generateTextBtn').addEventListener('click', async function() {
     const inputText = document.getElementById('gptInput').value;
 
     if (!inputText.trim()) {
@@ -1004,19 +1004,13 @@
     }
 
     const gptOutput = document.getElementById('gptOutput');
-    gptOutput.innerHTML = 'GPT가 글을 생성 중입니다...';
+    gptOutput.innerHTML = 'Gemini가 글을 생성 중입니다...';
 
     try {
-      // 서버리스 함수 (/api/gpt)를 호출
       const response = await fetch('/api/gpt', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          prompt: inputText,
-          max_tokens: 200,
-          temperature: 0.7,
-          model: "gpt-4o-mini"  // 사용하고자 하는 모델 (필요에 따라 수정)
-        })
+        body: JSON.stringify({ prompt: inputText })
       });
 
       const data = await response.json();
