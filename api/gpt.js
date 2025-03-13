@@ -1,3 +1,5 @@
+// pages/api/gpt.js
+
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
     console.error('❌ Method Not Allowed');
@@ -22,26 +24,27 @@ export default async function handler(req, res) {
   }
 
   try {
-    const response = await fetch(`https://generativelanguage.googleapis.com/v1/models/gemini-pro:generateContent?key=${GEMINI_API_KEY}`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        contents: [
-          { parts: [{ text: prompt }] }
-        ]
-      })
-    });
+    // Gemini API(실제로는 PaLM API) 호출 (모델명, 엔드포인트 확인 필요)
+    const response = await fetch(
+      `https://generativelanguage.googleapis.com/v1/models/gemini-pro:generateContent?key=${GEMINI_API_KEY}`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: [
+            { parts: [{ text: prompt }] }
+          ]
+        })
+      }
+    );
 
-    // 응답 상태 코드 로그
     console.log('✅ Gemini API Status:', response.status);
-
     const data = await response.json();
-
     console.log('✅ Gemini API 응답:', data);
 
-    if (data.candidates && data.candidates[0].content.parts[0].text) {
+    // data 구조에 따라 수정 필요
+    // 여기서는 data.candidates[0].content.parts[0].text 를 가져온다고 가정
+    if (data?.candidates && data.candidates[0]?.content?.parts[0]?.text) {
       return res.status(200).json({ answer: data.candidates[0].content.parts[0].text });
     } else {
       console.error('❌ Gemini API에서 유효한 답변을 받지 못했습니다.', data);
