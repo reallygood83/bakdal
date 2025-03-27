@@ -1,0 +1,19 @@
+{
+  "name": "bakdal-teacher-tools",
+  "version": "1.0.0",
+  "description": "박달초 교사용 수업 도구",
+  "main": "index.js",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start"
+  },
+  "dependencies": {
+    "next": "^13.0.0",
+    "openai": "^3.2.1",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  },
+  "author": "",
+  "license": "ISC"
+} 
