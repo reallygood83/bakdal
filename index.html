@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>박달초 교사용 수업 도구</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <h1 class="page-title">박달초 교사용 수업 도구</h1>
+        <p>❤️오늘 하루 평안하세요❤️</p>
+    </header>
+
+    <!-- 전체 섹션을 감싸는 컨테이너 (드래그앤드롭용) -->
+    <div id="sectionsContainer">
+        <!-- 1. 칠판 -->
+        <div class="section" draggable="true">
+            <div class="section-header">
+                <span>수업 칠판</span>
+                <button class="toggle-btn" aria-label="toggle">접기/펼치기</button>
+            </div>
+            <div class="section-content">
+                <div class="chalkboard-container">
+                    <div class="text-tools">
+                        <button id="boldBtn" title="굵게"><strong>B</strong></button>
+                        <button id="italicBtn" title="기울임"><em>I</em></button>
+                        <button id="underlineBtn" title="밑줄"><u>U</u></button>
+                        <div class="divider"></div>
+                        
+                        <!-- 글자 크기: 작게(16px), 보통(18px), 크게(24px), 매우 크게(32px) -->
+                        <select id="fontSizeSelector" title="글자 크기">
+                            <option value="16px">작게</option>
+                            <option value="18px" selected>보통</option>
+                            <option value="24px">크게</option>
+                            <option value="32px">매우 크게</option>
+                        </select>
+                        
+                        <!-- 텍스트 색깔에 검정색 추가 -->
+                        <select id="textColorSelector" title="글자 색상">
+                            <option value="white">흰색</option>
+                            <option value="black">검정색</option>
+                            <option value="yellow">노란색</option>
+                            <option value="lightblue">하늘색</option>
+                            <option value="pink">분홍색</option>
+                            <option value="#ffcc00">주황색</option>
+                            <option value="#90ee90">연두색</option>
+                        </select>
+                        
+                        <button id="highlightBtn" title="강조표시">형광펜</button>
+                        <div class="divider"></div>
+                        
+                        <!-- 전체 지우기 -->
+                        <button id="clearBtn" title="지우기">전체 지우기</button>
+                        <button id="copyBtn" title="복사">복사</button>
+                        <div class="divider"></div>
+                        <button id="youtubeEmbedBtn" title="유튜브 삽입">유튜브</button>
+                    </div>
+                    <div class="chalkboard">
+                        <div class="editor-container">
+                            <div id="chalkboardEditor" contenteditable="true" spellcheck="false"
+                                 placeholder="여기에 수업 내용을 적으세요...">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. 오늘 날짜 & 시간표 -->
+        <div class="section" draggable="true">
+            <div class="section-header">
+                <span>오늘 날짜 및 시간표</span>
+                <button class="toggle-btn" aria-label="toggle">접기/펼치기</button>
+            </div>
+            <div class="section-content">
+                <div class="date-timetable-section">
+                    <div class="date-timetable">
+                        <strong>오늘 날짜:</strong> <span id="todayInfo"></span>
+                    </div>
+                    <div class="timetable-container">
+                        <table class="timetable">
+                            <thead>
+                                <tr>
+                                    <th>1교시</th>
+                                    <th>2교시</th>
+                                    <th>3교시</th>
+                                    <th>4교시</th>
+                                    <th>5교시</th>
+                                    <th>6교시</th>
+                                    <th>7교시</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>
+                                        <select class="subjectSelector">
+                                            <option>국어</option>
+                                            <option>수학</option>
+                                            <option>사회</option>
+                                            <option>과학</option>
+                                            <option>영어</option>
+                                            <option>음악</option>
+                                            <option>미술</option>
+                                            <option>체육</option>
+                                            <option>실과</option>
+                                            <option>도덕</option>
+                                            <option>윤리</option>
+                                            <option>역사</option>
+                                            <option>가정</option>
+                                            <option>기술</option>
+                                            <option>입력</option>
+                                        </select>
+                                        <input type="text" class="customSubject" style="display:none" placeholder="직접 입력"/>
+                                    </td>
+                                    <td>
+                                        <select class="subjectSelector">
+                                            <option>국어</option>
+                                            <option>수학</option>
+                                            <option>사회</option>
+                                            <option>과학</option>
+                                            <option>영어</option>
+                                            <option>음악</option>
+                                            <option>미술</option>
+                                            <option>체육</option>
+                                            <option>실과</option>
+                                            <option>도덕</option>
+                                            <option>윤리</option>
+                                            <option>역사</option>
+                                            <option>가정</option>
+                                            <option>기술</option>
+                                            <option>입력</option>
+                                        </select>
+                                        <input type="text" class="customSubject" style="display:none" placeholder="직접 입력"/>
+                                    </td>
+                                    <td>
+                                        <select class="subjectSelector">
+                                            <option>국어</option>
+                                            <option>수학</option>
+                                            <option>사회</option>
+                                            <option>과학</option>
+                                            <option>영어</option>
+                                            <option>음악</option>
+                                            <option>미술</option>
+                                            <option>체육</option>
+                                            <option>실과</option>
+                                            <option>도덕</option>
+                                            <option>윤리</option>
+                                            <option>역사</option>
+                                            <option>가정</option>
+                                            <option>기술</option>
+                                            <option>입력</option>
+                                        </select>
+                                        <input type="text" class="customSubject" style="display:none" placeholder="직접 입력"/>
+                                    </td>
+                                    <td>
+                                        <select class="subjectSelector">
+                                            <option>국어</option>
+                                            <option>수학</option>
+                                            <option>사회</option>
+                                            <option>과학</option>
+                                            <option>영어</option>
+                                            <option>음악</option>
+                                            <option>미술</option>
+                                            <option>체육</option>
+                                            <option>실과</option>
+                                            <option>도덕</option>
+                                            <option>윤리</option>
+                                            <option>역사</option>
+                                            <option>가정</option>
+                                            <option>기술</option>
+                                            <option>입력</option>
+                                        </select>
+                                        <input type="text" class="customSubject" style="display:none" placeholder="직접 입력"/>
+                                    </td>
+                                    <td>
+                                        <select class="subjectSelector">
+                                            <option>국어</option>
+                                            <option>수학</option>
+                                            <option>사회</option>
+                                            <option>과학</option>
+                                            <option>영어</option>
+                                            <option>음악</option>
+                                            <option>미술</option>
+                                            <option>체육</option>
+                                            <option>실과</option>
+                                            <option>도덕</option>
+                                            <option>윤리</option>
+                                            <option>역사</option>
+                                            <option>가정</option>
+                                            <option>기술</option>
+                                            <option>입력</option>
+                                        </select>
+                                        <input type="text" class="customSubject" style="display:none" placeholder="직접 입력"/>
+                                    </td>
+                                    <td>
+                                        <select class="subjectSelector">
+                                            <option>국어</option>
+                                            <option>수학</option>
+                                            <option>사회</option>
+                                            <option>과학</option>
+                                            <option>영어</option>
+                                            <option>음악</option>
+                                            <option>미술</option>
+                                            <option>체육</option>
+                                            <option>실과</option>
+                                            <option>도덕</option>
+                                            <option>윤리</option>
+                                            <option>역사</option>
+                                            <option>가정</option>
+                                            <option>기술</option>
+                                            <option>입력</option>
+                                        </select>
+                                        <input type="text" class="customSubject" style="display:none" placeholder="직접 입력"/>
+                                    </td>
+                                    <td>
+                                        <select class="subjectSelector">
+                                            <option>국어</option>
+                                            <option>수학</option>
+                                            <option>사회</option>
+                                            <option>과학</option>
+                                            <option>영어</option>
+                                            <option>음악</option>
+                                            <option>미술</option>
+                                            <option>체육</option>
+                                            <option>실과</option>
+                                            <option>도덕</option>
+                                            <option>윤리</option>
+                                            <option>역사</option>
+                                            <option>가정</option>
+                                            <option>기술</option>
+                                            <option>입력</option>
+                                        </select>
+                                        <input type="text" class="customSubject" style="display:none" placeholder="직접 입력"/>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. GPT 글쓰기 도우미 섹션 -->
+        <div class="section" draggable="true">
+            <div class="section-header">
+                <span>GPT 글쓰기 도우미</span>
+                <button class="toggle-btn" aria-label="toggle">접기/펼치기</button>
+            </div>
+            <div class="section-content">
+                <div class="gpt-container">
+                    <h3>🤖박달초 GPT🤖</h3>
+                    <p>교사의 글쓰기를 돕는 GPT를 사용해 보세요.</p>
+
+                    <!-- 주제 입력 영역 -->
+                    <textarea id="gptInput" class="gpt-input" placeholder="주제를 입력하세요..." rows="4"></textarea>
+
+                    <!-- GPT 생성 버튼 -->
+                    <button id="generateTextBtn" class="generate-btn">글 생성하기</button>
+
+                    <!-- 결과 출력 영역 -->
+                    <div id="gptOutput" class="gpt-output"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 4. 학생 뽑기 -->
+        <div class="section" draggable="true">
+            <div class="section-header">
+                <span>학생 뽑기</span>
+                <button class="toggle-btn" aria-label="toggle">접기/펼치기</button>
+            </div>
+            <div class="section-content">
+                <div class="picker-section">
+                    <div class="picker-controls">
+                        <div>
+                            <label for="totalStudents">학생 총 수:</label>
+                            <input type="number" id="totalStudents" min="1" value="30" />
+                        </div>
+                        <div>
+                            <label for="pickCount">뽑을 학생 수:</label>
+                            <input type="number" id="pickCount" min="1" value="1" />
+                        </div>
+                        <button id="pickStudentsBtn">학생 뽑기</button>
+                        <button id="resetPickerBtn">초기화</button>
+                    </div>
+                    <div id="pickerResult" class="result-area">
+                        <p>학생을 뽑으면 결과가 여기에 표시됩니다.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 5. 모둠 편성 -->
+        <div class="section" draggable="true">
+            <div class="section-header">
+                <span>모둠 편성</span>
+                <button class="toggle-btn" aria-label="toggle">접기/펼치기</button>
+            </div>
+            <div class="section-content">
+                <div class="picker-section">
+                    <div class="picker-controls">
+                        <div>
+                            <label for="teamTotalStudents">학생 총 수:</label>
+                            <input type="number" id="teamTotalStudents" min="1" value="30" />
+                        </div>
+                        <div>
+                            <label for="missingNumbers">없는 번호:</label>
+                            <input type="text" id="missingNumbers" placeholder="예: 3, 7, 15" style="width:120px"/>
+                        </div>
+                        <div>
+                            <label for="groupCount">모둠 수:</label>
+                            <input type="number" id="groupCount" min="1" value="4" />
+                        </div>
+                        <button id="makeTeamsBtn">모둠 짜기</button>
+                        <button id="resetTeamsBtn">초기화</button>
+                    </div>
+                    <div id="teamsResult" class="result-area">
+                        <p>모둠 편성 결과가 여기에 표시됩니다.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 6. 시간 관리 -->
+        <div class="section" draggable="true">
+            <div class="section-header">
+                <span>시간 관리</span>
+                <button class="toggle-btn" aria-label="toggle">접기/펼치기</button>
+            </div>
+            <div class="section-content">
+                <div class="time-section">
+                    <!-- 디지털 시계 -->
+                    <div class="clock">
+                        <h3>현재 시간</h3>
+                        <div id="clockDisplay" class="time-display">00:00:00</div>
+                        <div id="dateDisplay"></div>
+                    </div>
+
+                    <!-- 타이머 -->
+                    <div class="timer">
+                        <h3>수업 타이머</h3>
+                        <div class="timer-inputs">
+                            <input type="number" id="hoursInput" min="0" max="99" placeholder="시" style="width: 60px" />
+                            <input type="number" id="minutesInput" min="0" max="59" placeholder="분" style="width: 60px" />
+                            <input type="number" id="secondsInput" min="0" max="59" placeholder="초" style="width: 60px" />
+                        </div>
+                        <div id="timerDisplay" class="time-display">00:00:00</div>
+                        <div class="timer-controls">
+                            <button id="startTimerBtn" class="start-btn">시작</button>
+                            <button id="stopTimerBtn" class="stop-btn">정지</button>
+                            <button id="resetTimerBtn" class="reset-btn">초기화</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 7. 안양박달초 학사일정 & 급식 -->
+        <div class="section" draggable="true">
+            <div class="section-header">
+                <span>안양박달초 학사일정 & 급식</span>
+                <button class="toggle-btn" aria-label="toggle">접기/펼치기</button>
+            </div>
+            <div class="section-content" style="padding: 20px;">
+                <h3>단위 선택</h3>
+                <div class="unit-selection">
+                    <label for="scheduleUnit">학사일정 단위:</label>
+                    <select id="scheduleUnit">
+                        <option value="day">일간</option>
+                        <option value="week">주간</option>
+                        <option value="month" selected>월간</option>
+                    </select>
+                    
+                    <label for="mealUnit">급식 정보 단위:</label>
+                    <select id="mealUnit">
+                        <option value="day">일간</option>
+                        <option value="week">주간</option>
+                        <option value="month" selected>월간</option>
+                    </select>
+                </div>
+
+                <h3>학사일정</h3>
+                <button id="fetchScheduleBtn">학사일정 불러오기</button>
+                <div id="scheduleResult" class="result-area"></div>
+
+                <hr style="margin:20px 0;" />
+
+                <h3>급식정보</h3>
+                <button id="fetchMealsBtn">급식정보 불러오기</button>
+                <div id="mealsResult" class="result-area"></div>
+            </div>
+        </div>
+    </div>
+
+    <footer style="text-align: center; padding: 20px 0; background-color: #f8f8f8; border-top: 1px solid #ddd; margin-top: 40px;">
+        <p style="font-size: 1rem; color: #2a623d;">
+            <a href="https://pebble-stallion-abb.notion.site/1b210244f99780a19431c44075aa2c69?pvs=4" target="_blank" style="color: #2a623d; text-decoration: none;">개발자에 제안하기</a>
+        </p>
+        <p style="font-size: 1rem; color: #2a623d;">
+            &copy; 2025 <a href="https://www.youtube.com/@%EB%B0%B0%EC%9B%80%EC%9D%98%EB%8B%AC%EC%9D%B8-p5v" target="_blank" style="color: #2a623d; text-decoration: none;">배움의 달인 김문정</a>. All Rights Reserved.
+        </p>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html> 
